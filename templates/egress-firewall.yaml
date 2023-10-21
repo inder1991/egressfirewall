@@ -1,0 +1,44 @@
+{{- $globalCIDRRule := .Values.globalCIDRRule }}
+
+{{- range .Values.egressFirewalls }}
+apiVersion: k8s.ovn.org/v1
+kind: EgressFirewall
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace }}
+spec:
+  egressRules:
+    {{- range $globalCIDRRule }}    # Apply the globalCIDRRule containing deny and allow rules
+    - type: {{ .type }}
+      to:
+        {{- range .to }}
+        {{- if .dnsName }}
+        - dnsName: {{ .dnsName }}
+        {{- else if .cidr }}
+        - cidr: {{ .cidr }}
+        {{- end }}
+        {{- end }}
+      ports:
+        {{- range .ports }}
+        - protocol: {{ .protocol }}
+          port: {{ .port }}
+        {{- end }}
+    {{- end }}
+    {{- range .rules }}
+    - type: {{ .type }}
+      to:
+        {{- range .to }}
+        {{- if .dnsName }}
+        - dnsName: {{ .dnsName }}
+        {{- else if .cidr }}
+        - cidr: {{ .cidr }}
+        {{- end }}
+        {{- end }}
+      ports:
+        {{- range .ports }}
+        - protocol: {{ .protocol }}
+          port: {{ .port }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+

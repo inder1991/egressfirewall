@@ -1,0 +1,46 @@
+# Define the globalCIDRRule containing both deny and allow rules.
+
+globalCIDRRule:
+  - type: deny
+    to:
+      - cidr: 0.0.0.0/0       # Deny all traffic
+  - type: allow
+    to:
+      - cidr: 10.0.0.0/16     # Allow traffic to OpenShift pod CIDR range
+    ports:
+      - protocol: tcp
+        port: 80
+      - protocol: tcp
+        port: 443
+egressFirewalls:
+  - name: egress-firewall-1
+    namespace: your-namespace-1
+    rules:
+      - type: allow
+        to:
+          - dnsName: example.com
+        ports:
+          - protocol: tcp
+            port: 80
+          - protocol: tcp
+            port: 443
+      - type: allow
+        to:
+          - cidr: 192.168.1.0/24
+        ports:
+          - protocol: tcp
+            port: 8080
+          - protocol: tcp
+            port: 8443
+  - name: egress-firewall-2
+    namespace: your-namespace-2
+    rules:
+      - type: allow
+        to:
+          - dnsName: example2.com
+        ports:
+          - protocol: tcp
+            port: 8080
+          - protocol: tcp
+            port: 8443
+
